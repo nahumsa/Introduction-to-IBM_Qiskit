@@ -14,6 +14,11 @@ Now you install Qiskit:
 
 - pip install qiskit-terra[visualization]
 
-In order to test if the qiskit is installed you import on your python enviroment.
+To put this environtmen on your jupyter notebook environment you need to type the following comands:
+
+- source activate qiskit_env
+- python -m ipykernel install --name qiskit_env --display-name "qiskit_env"
+
+In order to test if the qiskit is installed you import on your python enviroment. 
 
 ## Codes
