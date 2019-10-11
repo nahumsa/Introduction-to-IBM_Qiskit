@@ -27,3 +27,17 @@ To put this environtmen on your jupyter notebook environment you need to type th
 In order to test if the qiskit is installed you import on your python enviroment. 
 
 ## Codes
+
+- Initial Tutorial
+
+    In this code you will learn:
+    
+        - Build a simple circuit that creates a bell state using Hadamard and C-Not gates.
+        
+        - Simulate your circuit theoretically  to get the state vector.
+        
+        - Build a real circuit that measures your Qubits in order to give bits of information.
+        
+        - Simulate measurement circuits that can be applied to real quantum computers.
+        
+        - Run your circuit in the a Real Quantum Computer.
