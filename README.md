@@ -41,3 +41,8 @@ In order to test if the qiskit is installed you import on your python enviroment
         - Simulate measurement circuits that can be applied to real quantum computers.
         
         - Run your circuit in the a Real Quantum Computer.
+        
+        
+- Deutch Algorithm
+
+    In this code you will see the first application of a quantum computer predicting if a boolean function is balanced or constant with only one query.
