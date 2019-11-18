@@ -46,3 +46,8 @@ In order to test if the qiskit is installed you import on your python enviroment
 - Deutsch Algorithm
 
     In this code you will see the first application of a quantum computer predicting if a boolean function is balanced or constant with only one query.
+
+
+- Quantum Fourier Transform
+
+    In this code you will learn one of the building blocks of inumerous algorithms in Quantum Computing.
