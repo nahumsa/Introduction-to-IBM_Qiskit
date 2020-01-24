@@ -47,6 +47,9 @@ In order to test if the qiskit is installed you import on your python enviroment
 
     In this code you will see the first application of a quantum computer predicting if a boolean function is balanced or constant with only one query.
 
+- Grover Algorithm
+
+    In this code you will learn the main quantum search algorithm.
 
 - Quantum Fourier Transform
 
