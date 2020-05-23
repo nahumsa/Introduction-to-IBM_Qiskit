@@ -28,6 +28,8 @@ In order to test if the qiskit is installed you import on your python enviroment
 
 ## Codes
 
+For better visualization, please use [nbviewer](https://nbviewer.jupyter.org/)
+
 - Initial Tutorial
 
     In this code you will learn:
@@ -54,3 +56,11 @@ In order to test if the qiskit is installed you import on your python enviroment
 - Quantum Fourier Transform
 
     In this code you will learn one of the building blocks of inumerous algorithms in Quantum Computing.
+
+- Quantum Phase Estimation
+
+    In this notebook you will learn about a way to get eigenvalues from a given state. This is an important subroutine that is used on various quantum algorithms.
+
+- Tomography
+
+    In this notebook you will learn about Quantum State Tomography, that is really important to characterize unknown quantum states.
