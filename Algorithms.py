@@ -1,5 +1,6 @@
 import qiskit as qsk 
 import numpy as np
+from qiskit.circuit.add_control import add_control
 
 def _qft(circuit, n):
     """ QFT on a circuit.
@@ -95,9 +96,7 @@ def inverse_QFT(circuit,n):
     circuit.append(inverseqft, circuit.qubits[:n])
     return circuit.decompose()
 
-from qiskit.circuit.add_control import add_control
-
-def qpe(circuit, unitary, n_precision,n_ancilla):   
+def _qpe(circuit, unitary, n_precision,n_ancilla):   
     """Applies the quantum phase estimation for a given unitary.
 
     Parameters
@@ -128,4 +127,26 @@ def qpe(circuit, unitary, n_precision,n_ancilla):
             circuit.append(U_ctrl, [counting_qubit,*[n_precision + ancilla for ancilla in range(n_ancilla)]])         
         repetitions *= 2
     inverse_QFT(circuit,n_precision)    
-    return qpe
+    return circuit
+
+def QPE(circuit, unitary, n_precision,n_ancilla):
+    """Applies the quantum phase estimation for a given unitary.
+
+    Parameters
+    ------------------------------------------------
+    circuit(qiskit.QuantumCircuit): Quantum Circuit.
+    unitary(np.array): Unitary.
+    n_precision(int): Number of qubits used for precision.
+    n_ancilla(int): Number of qubits used for generating the eigenstates, 
+                    must be len(unitary)//2 = n_ancilla.
+
+    Output
+    ------------------------------------------------
+    circuit(qiskit.QuantumCircuit): Quantum Circuit with
+                                    qft.
+    
+    """
+    n_qubits = n_precision + n_ancilla
+    qpe_circuit= _qpe(qsk.QuantumCircuit(n_qubits, name='QPE'), unitary, n_precision, n_ancilla)
+    circuit.append(qpe_circuit, circuit.qubits[:n_qubits])
+    return circuit.decompose()
