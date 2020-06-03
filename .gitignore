@@ -2,3 +2,5 @@
 *.pyc
 .ipynb_checkpoints/
 Notebooks/QMP.ipynb
+__pycache__/
+.vscode/
