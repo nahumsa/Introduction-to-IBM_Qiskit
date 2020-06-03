@@ -1,3 +1,4 @@
 .vscode/settings.json
 *.pyc
 .ipynb_checkpoints/
+Notebooks/QMP.ipynb
