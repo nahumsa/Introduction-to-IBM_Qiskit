@@ -64,3 +64,7 @@ For better visualization, please use [nbviewer](https://nbviewer.jupyter.org/)
 - Tomography
 
     In this notebook you will learn about Quantum State Tomography, that is really important to characterize unknown quantum states.
+
+- Quantum Counting
+
+    In this notebook we will learn a way to count how many solutions are on a given quantum search algorithm.
