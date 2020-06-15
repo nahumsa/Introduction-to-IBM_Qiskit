@@ -97,16 +97,17 @@ def inverse_QFT(circuit,qregister):
     circuit.append(inverseqft, qregister)
     return circuit
 
-def _qpe(circuit, unitary, n_precision,n_ancilla):   
+def qpe(circuit, unitary, precision, ancilla, init_state=None):   
     """Applies the quantum phase estimation for a given unitary.
 
     Parameters
     ------------------------------------------------
     circuit(qiskit.QuantumCircuit): Quantum Circuit.
     unitary(np.array): Unitary.
-    n_precision(int): Number of qubits used for precision.
-    n_ancilla(int): Number of qubits used for generating the eigenstates, 
-                    must be len(unitary)//2 = n_ancilla.
+    precision(QuantumRegister): Quantum register for the precision of the QPE.
+    ancilla(QuantumRegister): Quantum register for the ancilla,
+                   must be len(unitary)//2 = n_ancilla.
+    init_state(list): Initial state for the ancilla qubit.
 
     Output
     ------------------------------------------------
@@ -114,32 +115,40 @@ def _qpe(circuit, unitary, n_precision,n_ancilla):
                                     qft.
     
     """
+    #n_precision = len(precision)
+    n_ancilla = len(ancilla)
     assert len(unitary)//2 == n_ancilla, "Ancilla qubits does't match the number needed to expand the eigenstate."    
-    #Ancilla (need to add a way to initialize states)
-    circuit.h([n_precision + ancilla for ancilla in range(n_ancilla)]) 
+    
+    #Ancilla (need to add a way to initialize states)    
+    if init_state is not None:
+        assert len(init_state) == 2**n_ancilla , "Initial state not valid."
+        circuit.initialize(init_state, ancilla)
+            
     #Precision
-    circuit.h(range(n_precision))
+    circuit.h(precision)
     #Build unitary
     U = qsk.extensions.UnitaryGate(unitary, label='U')
     U_ctrl = add_control(U, num_ctrl_qubits=1, label='Controlled_U',ctrl_state=1)    
     repetitions = 1
-    for counting_qubit in range(n_precision):
+    for counting_qubit in precision:
         for _ in range(repetitions):                        
-            circuit.append(U_ctrl, [counting_qubit,*[n_precision + ancilla for ancilla in range(n_ancilla)]])         
+            circuit.append(U_ctrl, [counting_qubit,ancilla])         
         repetitions *= 2
-    inverse_QFT(circuit,n_precision)    
+    inverse_QFT(circuit, precision)   
+    
     return circuit
 
-def QPE(circuit, unitary, n_precision,n_ancilla):
-    """Applies the quantum phase estimation for a given unitary.
+def QPE(circuit, unitary, precision, ancilla, init_state=None):
+    """ Inverse QPE. 
 
     Parameters
     ------------------------------------------------
     circuit(qiskit.QuantumCircuit): Quantum Circuit.
     unitary(np.array): Unitary.
-    n_precision(int): Number of qubits used for precision.
-    n_ancilla(int): Number of qubits used for generating the eigenstates, 
-                    must be len(unitary)//2 = n_ancilla.
+    precision(QuantumRegister): Quantum register for the precision of the QPE.
+    ancilla(QuantumRegister): Quantum register for the ancilla,
+                   must be len(unitary)//2 = n_ancilla.
+    init_state(list): Initial state for the ancilla qubit.
 
     Output
     ------------------------------------------------
@@ -147,7 +156,41 @@ def QPE(circuit, unitary, n_precision,n_ancilla):
                                     qft.
     
     """
-    n_qubits = n_precision + n_ancilla
-    qpe_circuit= _qpe(qsk.QuantumCircuit(n_qubits, name='QPE'), unitary, n_precision, n_ancilla)
-    circuit.append(qpe_circuit, circuit.qubits[:n_qubits])
-    return circuit.decompose()
+    qpe_circuit = qsk.QuantumCircuit(precision, name='QPE')
+    qpe_circuit.add_register(ancilla)
+    qpe_circuit= qpe(qpe_circuit, unitary, precision, ancilla, init_state=init_state)    
+    
+    append_qbits = [i for i in precision]
+    for i in ancilla:
+        append_qbits.append(i)
+    
+    circuit.append(qpe_circuit, append_qbits)
+    return circuit
+
+def inverse_QPE(circuit, unitary, precision, ancilla, init_state=None):
+    """ Inverse QPE. 
+
+    Parameters
+    ------------------------------------------------
+    circuit(qiskit.QuantumCircuit): Quantum Circuit.
+    unitary(np.array): Unitary.
+    precision(QuantumRegister): Quantum register for the precision of the QPE.
+    ancilla(QuantumRegister): Quantum register for the ancilla,
+                   must be len(unitary)//2 = n_ancilla.
+    init_state(list): Initial state for the ancilla qubit.
+
+    Output
+    ------------------------------------------------
+    circuit(qiskit.QuantumCircuit): Quantum Circuit with
+                                    qft.
+    
+    """
+    qpe_circuit = qsk.QuantumCircuit(precision, name='QPE')
+    qpe_circuit.add_register(ancilla)
+    qpe_circuit= qpe(qpe_circuit, unitary, precision, ancilla, init_state=init_state)    
+    inverseqpe = qpe_circuit.inverse()
+    append_qbits = [i for i in precision]
+    for i in ancilla:
+        append_qbits.append(i)
+    circuit.append(inverseqpe, append_qbits)
+    return circuit
