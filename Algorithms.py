@@ -2,13 +2,13 @@ import qiskit as qsk
 import numpy as np
 from qiskit.circuit.add_control import add_control
 
-def _qft(circuit, n):
+def _qft(circuit, qregister):
     """ QFT on a circuit.
 
     Parameters
     ------------------------------------------------
     circuit(qiskit.QuantumCircuit): Quantum Circuit.
-    n(int): qubit to do the rotation.
+    qregister(qiskit.QuantumRegister): Quantum register for the rotation.
 
     Output
     ------------------------------------------------
@@ -17,14 +17,14 @@ def _qft(circuit, n):
     
     """    
     
-    def qft_rotations(circuit, n):
+    def qft_rotations(circuit, qregister):
         """ Defines the rotations necessary for the QFT
         in a recursive manner.
 
         Parameters
         ------------------------------------------------
         circuit(qiskit.QuantumCircuit): Quantum Circuit.
-        n(int): qubit to do the rotation.
+        qregister(qiskit.QuantumRegister): Quantum register for the rotation.
 
         Output
         ------------------------------------------------
@@ -32,13 +32,13 @@ def _qft(circuit, n):
                                         qft.
 
         """
-        for i in reversed(range(n)):
+        for i in reversed(qregister):
             circuit.h(i)
-            for qubit in range(i):
-                circuit.cu1(np.pi/float(2**(i-qubit)), qubit, i)    
+            for qubit in range(i.index):
+                circuit.cu1(np.pi/float(2**(i.index-qubit)), qregister[qubit], qregister[i.index])    
         return circuit    
 
-    def qft_swap(circuit, n):
+    def qft_swap(circuit, qregister):
         """Swap registers for the QFT.
         
         Parameters
@@ -51,21 +51,22 @@ def _qft(circuit, n):
         circuit(qiskit.QuantumCircuit): Quantum Circuit with
                                         qft.
         """
+        n = len(qregister)
         for qubit in range(n//2):
-            circuit.swap(qubit, n-qubit-1)
+            circuit.swap(qregister[qubit], qregister[n-qubit-1])
         return circuit
 
-    qft_rotations(circuit,n)
-    qft_swap(circuit, n)
+    qft_rotations(circuit,qregister)
+    qft_swap(circuit, qregister)
     return circuit
 
-def qft(circuit,n):
+def qft(circuit,qregister):
     """QFT. 
 
     Parameters
     ------------------------------------------------
     circuit(qiskit.QuantumCircuit): Quantum Circuit.
-    n(int): qubit to do the rotation.
+    qregister(qiskit.QuantumRegister): Quantum register for the rotation.
 
     Output
     ------------------------------------------------
@@ -73,17 +74,17 @@ def qft(circuit,n):
                                     qft.
     
     """
-    qft_circuit= _qft(qsk.QuantumCircuit(n, name='QFT'), n)
-    circuit.append(qft_circuit, circuit.qubits[:n])
-    return circuit.decompose()
+    qft_circuit= _qft(qsk.QuantumCircuit(qregister, name='QFT'), qregister)
+    circuit.append(qft_circuit, qregister)
+    return circuit
 
-def inverse_QFT(circuit,n):
+def inverse_QFT(circuit,qregister):
     """ Inverse QFT. 
 
     Parameters
     ------------------------------------------------
     circuit(qiskit.QuantumCircuit): Quantum Circuit.
-    n(int): qubit to do the rotation.
+    qregister(qiskit.QuantumRegister): Quantum register for the rotation.
 
     Output
     ------------------------------------------------
@@ -91,10 +92,10 @@ def inverse_QFT(circuit,n):
                                     qft.
     
     """
-    qft_circuit= _qft(qsk.QuantumCircuit(n, name='QFT'), n)
+    qft_circuit= _qft(qsk.QuantumCircuit(qregister, name='QFT'), qregister)
     inverseqft = qft_circuit.inverse()
-    circuit.append(inverseqft, circuit.qubits[:n])
-    return circuit.decompose()
+    circuit.append(inverseqft, qregister)
+    return circuit
 
 def _qpe(circuit, unitary, n_precision,n_ancilla):   
     """Applies the quantum phase estimation for a given unitary.
