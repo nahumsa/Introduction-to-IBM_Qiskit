@@ -1,4 +1,4 @@
-# Introduction-to-IBM_Qiskit
+# Introduction to IBM Qiskit
 
 ## Instalation
 
